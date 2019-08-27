@@ -9,8 +9,8 @@ resources:
 - repo: self
 
 variables:
-  tag: 'brzomessage_front_$(Build.BuildId)'  
-  tagLatest: 'brzomessage_front_latest' 
+  tag: 'brzomessage_react_$(Build.BuildId)'  
+  tagLatest: 'brzomessage_react_latest' 
   dockerId: '070913'
   dockerRepository: 'adarosci'
 
