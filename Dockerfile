@@ -1,15 +1,16 @@
+
 ### STAGE 1: Build ###
 
 # We label our stage as ‘builder’
 FROM node:alpine as builder
-
-WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
-RUN yarn
-COPY . ./
-RUN yarn build
+## Storing node modules on a separate layer will prevent unnecessary npm installs at each build
+RUN npm i && mkdir /app && mv ./node_modules ./app
+WORKDIR /app
+COPY . .
+RUN npm build
 
 FROM nginx:alpine
-COPY --from=build-deps /usr/src/app/build /usr/share/nginx/html
+COPY --from=build-deps /app/build /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
