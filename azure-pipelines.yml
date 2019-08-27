@@ -19,7 +19,7 @@ stages:
   displayName: Build and Push
   jobs:
   - job: BuildDeploy
-    displayName: Docker Build and Push1
+    displayName: Docker Build and Push
     steps:
       - script: |
           docker build -t $(dockerId)/$(dockerRepository):$(tag) -t $(dockerId)/$(dockerRepository):$(tagLatest) . -f Dockerfile
