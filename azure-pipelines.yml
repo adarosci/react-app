@@ -1,0 +1,43 @@
+# Docker
+# Build a Docker image 
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  tag: 'brzomessage_front_$(Build.BuildId)'  
+  tagLatest: 'brzomessage_front_latest' 
+  dockerId: '070913'
+  dockerRepository: 'adarosci'
+
+stages:
+- stage: Build
+  displayName: Build and Push
+  jobs:
+  - job: BuildDeploy
+    displayName: Docker Build and Push1
+    steps:
+      - script: |
+          docker build -t $(dockerId)/$(dockerRepository):$(tag) -t $(dockerId)/$(dockerRepository):$(tagLatest) . -f Dockerfile
+          docker login --username=$(dockerId) --password=$(docker_password)
+          docker push $(dockerId)/$(dockerRepository):$(tag)
+          docker push $(dockerId)/$(dockerRepository):$(tagLatest)
+        displayName: Build and Push
+      - task: SSH@0
+        displayName: Docker pull
+        inputs:
+          sshEndpoint: 'DeployDigitalOcean'
+          runOptions: 'commands'
+          commands: |
+            docker pull $(dockerId)/$(dockerRepository):$(tagLatest)
+      - task: SSH@0
+        displayName: Deploy
+        inputs:
+          sshEndpoint: 'DeployDigitalOcean'
+          runOptions: 'script'
+          scriptPath: './deploy.sh'
+          failOnStdErr: false
